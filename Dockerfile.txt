@@ -1,0 +1,50 @@
+# какой базовый образ использовать
+FROM ubuntu:latest
+
+# описание образа (не обязательно)
+LABEL authors="pyden"
+
+# какие-то команды, выполняемые при запуске контейнера
+RUN apt-get update
+# флаг -y автоматически подтвердит установку
+RUN apt-get nginx -y
+# и запуск nginx
+CMD ["nginx", "-g", "daemon off;"]
+# docker build -t myimage:v07 . --- собираем
+# docker run -d --rm -p 80:80 myimage:v07 --- запускаем
+
+# apache
+RUN apt-get install apache2 -y
+CMD ["apache2ctl", "-D", "FOREGROUND"]
+
+# рабочая директория, та директория, куда мы попадем при exec -it
+WORKDIR /var/www/html/
+
+# указываем какие файлы нужно скопировать в образ, т.е. в рабочую директорию (не обязательно)
+COPY files2/index.html .
+COPY files2/script.sh .opt/script.sh
+# --- запуск с volumes, в files лежит index.html
+COPY files/index.html /var/www/html/
+# аналогично
+# docker run -d --rm -p 80:80 -v D:\Python_projects\docker_home\docker1\files:/var/www/html myimage:v08
+
+# запуск скрипта из файла, если надо
+RUN chmod +x /opt/script.sh
+
+# указать переменные окружения
+ENV OWNER="Denis"
+ENV TYPE=demo
+
+# просто сообщаем какие порты открыт
+# это будет видно в docker image inspect myimage:v08
+EXPOSE 80
+EXPOSE 443/tcp
+
+# описание команд при запуске
+# в ENTRYPOINT неизменяемые команды
+# если передать в конце вызова контейнера строку, echo ее отобразит
+ENTRYPOINT ["echo"]
+# в CMD изменяемы
+CMD ["Hello my FIRST Docker"]
+
+# Запск
